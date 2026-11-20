@@ -1,0 +1,67 @@
+{
+  "data_source": "synthetic",
+  "n_train": 810,
+  "n_test": 350,
+  "models": {
+    "logistic_regression": {
+      "accuracy": 0.82,
+      "macro_f1": 0.667135788091491
+    },
+    "random_forest": {
+      "accuracy": 0.96,
+      "macro_f1": 0.9444874140528579
+    }
+  },
+  "best_model": "random_forest",
+  "classes": [
+    "normal",
+    "inner_race",
+    "ball",
+    "outer_race"
+  ],
+  "confusion_matrix": [
+    [
+      32,
+      2,
+      0,
+      1
+    ],
+    [
+      7,
+      97,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      105,
+      0
+    ],
+    [
+      0,
+      2,
+      1,
+      102
+    ]
+  ],
+  "feature_importance": {
+    "env_bpfo": 0.1974,
+    "env_bpfi": 0.1519,
+    "band_2000_4000": 0.1476,
+    "std": 0.1453,
+    "rms": 0.1443,
+    "peak_to_peak": 0.0514,
+    "peak": 0.029,
+    "band_4000_6000": 0.0266,
+    "kurtosis": 0.0211,
+    "band_500_2000": 0.0197,
+    "shape_factor": 0.0119,
+    "band_0_500": 0.0105,
+    "crest_factor": 0.0098,
+    "impulse_factor": 0.0093,
+    "spectral_centroid": 0.0086,
+    "skewness": 0.0084,
+    "env_bsf": 0.0072
+  }
+}

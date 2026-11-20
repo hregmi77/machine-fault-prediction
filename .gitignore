@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+data/raw/*.mat
+data/processed/
+models/*.joblib
+.streamlit/secrets.toml
+.DS_Store
