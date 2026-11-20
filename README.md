@@ -102,12 +102,64 @@ downloads the CWRU data and trains the model by itself (about a minute), then ca
 ## Ideas for next steps
 
 - Severity regression (0.007 / 0.014 / 0.021 in defect size) and remaining-useful-life trend
-- Test on other motor loads (1–3 HP) to check the model generalizes
+- Train on 0 hp and test on 1–3 hp (files 106–108, 119–121, 131–133, ...) to check that the model generalizes across load and speed
 - Stream live data from a USB accelerometer or MQTT and score it in real time
 
-## Data credit
+## Dataset: CWRU Bearing Data Center
 
-Case Western Reserve University Bearing Data Center. Data used for research and education.
+Real vibration data from the [Case Western Reserve University Bearing Data Center](https://engineering.case.edu/bearingdatacenter),
+one of the most widely used benchmarks for motor bearing fault diagnosis.
+
+**Test rig.** A 2 hp electric motor drives a shaft supported by the test bearings. A torque
+transducer/encoder in the middle measures speed and power, and a dynamometer on the far end applies
+load (0–3 hp). Accelerometers on magnetic bases sit on the motor housing at the drive end and fan end.
+
+**Seeded faults.** Single-point defects were cut into SKF 6205-2RS deep-groove ball bearings with
+electro-discharge machining (EDM), at the **inner race**, a **ball**, or the **outer race**, in
+diameters of 0.007", 0.014", and 0.021" (0.028" and 0.040" on equivalent NTN bearings).
+
+**Signals.** MATLAB `.mat` files, about 10 s each, sampled at **12 kHz** (drive-end faults also at 48 kHz):
+`DE` drive-end accelerometer (used here), `FE` fan-end accelerometer, `BA` base accelerometer, `RPM`.
+
+**Operating conditions.**
+
+| Motor load | Shaft speed | Shaft frequency |
+|---|---|---|
+| 0 hp | 1797 rpm | 29.95 Hz |
+| 1 hp | 1772 rpm | 29.53 Hz |
+| 2 hp | 1750 rpm | 29.17 Hz |
+| 3 hp | 1730 rpm | 28.83 Hz |
+
+**Files used in this project** (12 kHz drive end, 0 hp, 1797 rpm; downloaded by `src/download_cwru.py`):
+
+| Condition | 0.007" | 0.014" | 0.021" |
+|---|---|---|---|
+| Normal baseline | 97 | – | – |
+| Inner race | 105 | 169 | 209 |
+| Ball | 118 | 185 | 222 |
+| Outer race (centered @ 6:00) | 130 | 197 | 234 |
+
+**Bearing defect frequencies** (SKF 6205, multiples of shaft speed; values at 1797 rpm):
+
+| Defect | Multiplier | Frequency |
+|---|---|---|
+| BPFI: inner race | 5.4152 × | 162.2 Hz |
+| BPFO: outer race | 3.5848 × | 107.4 Hz |
+| BSF: ball spin | 2.3570 × | 70.6 Hz |
+
+A defect produces a short impact each time a rolling element passes it, so the envelope spectrum
+shows a peak at that part's defect frequency. That's why `env_bpfo` and `env_bpfi` are the model's
+top features.
+
+**Limitations (and how this project handles them).**
+- Faults are artificially seeded on a lab rig, not natural wear, so real-plant data is noisier.
+- There's one ~10 s recording per condition, so overlapping windows are highly correlated. A random
+  train/test split would leak and overstate accuracy, so this project uses a **time-based split**
+  (first 70% of each recording trains, last 30% tests).
+- Only one load (0 hp) is used. Training on one load and testing on another is the natural next test.
+
+Data © Case Western Reserve University, provided for research and education. Cite as:
+*Case Western Reserve University Bearing Data Center, https://engineering.case.edu/bearingdatacenter.*
 
 ---
 Built by **Hem Regmi**: controls and test engineer (Stanadyne, Tesla) · [GitHub](https://github.com/hregmi77) · [LinkedIn](https://linkedin.com/in/hregmi)

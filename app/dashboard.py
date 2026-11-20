@@ -76,6 +76,20 @@ st.caption(
     f"{len(recs)} recordings · sampled at {FS:,} Hz"
 )
 
+with st.expander("ℹ️ About the data: CWRU Bearing Data Center"):
+    st.markdown("""
+**Test rig:** a 2 hp electric motor drives a shaft on SKF 6205 ball bearings; a dynamometer applies 0–3 hp of load,
+and accelerometers on the motor housing record vibration at **12,000 samples/s**.
+
+**Faults:** single pits cut by electro-discharge machining (EDM) into the **inner race**, a **ball**, or the **outer race**,
+0.007"–0.021" in diameter. This app uses the drive-end accelerometer at 0 hp (1797 rpm): 1 normal + 9 fault recordings.
+
+**Why envelope analysis works:** each time a ball rolls over the pit it makes a small impact, so the vibration envelope
+pulses at the defect frequency: **BPFI 162 Hz** (inner), **BPFO 107 Hz** (outer), **BSF 71 Hz** (ball).
+
+Source: [Case Western Reserve University Bearing Data Center](https://engineering.case.edu/bearingdatacenter)
+""")
+
 if df is None or bundle is None:
     st.error("Training failed. Run `python -m src.train` locally to see the error.")
     st.stop()
