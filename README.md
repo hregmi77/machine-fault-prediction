@@ -4,6 +4,10 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+[![Open live demo](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hregmi77-fault-prediction.streamlit.app)
+
+**▶ Try it live: [hregmi77-fault-prediction.streamlit.app](https://hregmi77-fault-prediction.streamlit.app)** (no install needed)
+
 Find failing bearings from accelerometer data, identify **which part** is failing, and rank machines
 so maintenance fixes the riskiest ones first, all shown in an interactive dashboard.
 
@@ -70,10 +74,20 @@ resonance, plus noise. The dashboard labels which source it's using.
 The most important features are the envelope amplitudes at BPFO and BPFI, which matches the physics:
 the model learns to listen for impacts at the defect frequency, not just "more vibration."
 
+## Deploy your own live demo
+
+The dashboard runs on [Streamlit Community Cloud](https://share.streamlit.io) for free. On first launch it
+downloads the CWRU data and trains the model by itself (about a minute), then caches the result.
+
+1. Sign in to share.streamlit.io with GitHub, then choose **Create app → Deploy a public app from GitHub**.
+2. Repository `hregmi77/machine-fault-prediction`, branch `main`, main file `app/dashboard.py`.
+3. Under **Advanced settings**, pick Python 3.11. Under **App URL**, enter `hregmi77-fault-prediction`.
+4. Click **Deploy**.
+
 ## Project structure
 
 ```
-├── app/dashboard.py        Streamlit dashboard (4 tabs)
+├── app/dashboard.py        Streamlit dashboard (4 tabs); trains on first launch if needed
 ├── src/
 │   ├── config.py           sampling rate, bearing geometry, defect frequencies, file list
 │   ├── download_cwru.py    fetches the CWRU .mat files

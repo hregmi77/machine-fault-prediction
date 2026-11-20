@@ -15,7 +15,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from src.config import BPFI, BPFO, BSF, CLASSES, FS, MODEL_DIR, PROCESSED_DIR, WINDOW  # noqa: E402
+from src.config import BPFI, BPFO, BSF, CLASSES, FS, MODEL_DIR, PROCESSED_DIR, RAW_DIR, WINDOW  # noqa: E402
 from src.data import load_recordings  # noqa: E402
 from src.features import FEATURE_COLS, envelope_spectrum, spectrum  # noqa: E402
 
@@ -47,6 +47,23 @@ def get_metrics():
     return json.loads(path.read_text()) if path.exists() else None
 
 
+@st.cache_resource(show_spinner=False)
+def ensure_trained() -> None:
+    """First run (e.g. on Streamlit Community Cloud): fetch data and train once."""
+    if (MODEL_DIR / "model.joblib").exists() and (PROCESSED_DIR / "features.csv").exists():
+        return
+    with st.spinner("First launch: downloading CWRU data and training the model (about a minute)..."):
+        if not any(RAW_DIR.glob("*.mat")):
+            try:
+                from src.download_cwru import download
+                download()
+            except Exception as exc:  # no network: fall back to synthetic data
+                st.info(f"Could not download CWRU data ({exc}); using synthetic data.")
+        from src.train import main as train
+        train()
+
+
+ensure_trained()
 recs = get_recordings()
 df = get_features()
 bundle = get_model()
@@ -60,7 +77,7 @@ st.caption(
 )
 
 if df is None or bundle is None:
-    st.warning("No trained model yet. Run `python -m src.train` first, then refresh.")
+    st.error("Training failed. Run `python -m src.train` locally to see the error.")
     st.stop()
 
 tab_signal, tab_feat, tab_model, tab_fleet = st.tabs(
